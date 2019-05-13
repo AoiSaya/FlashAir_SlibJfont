@@ -1,38 +1,62 @@
-# FlashAir_SlibJfont
+# Lua library for Japanese FONT handler of FlashAir.
 
-Lua library for FONT Handring of FlashAir.
+これはFlashAirで日本語フォントを扱うためのライブラリです。  
+UTF-8またはEUC-JP文字列に対応するビットマップを取得できます。  
+  
+【更新履歴】  
+(0.01)  
 
-## Convert table information
-Original idea and convert table by mgo-tec.
-https://github.com/mgo-tec/UTF8_to_Shift_JIS
+　
+UTF-8からEUC-JPに変換する関数を
 
-�A�h���X0xB0 "��" UTF8= C2A2�`�AShift_JIS= 0x8191
+現バージョンは、BDFフォント(JIS並び)に対応しています。  
 
-�A�h���X0x1EEC "�]" UTF8= E28090�`�AShift_JIS= 0x815D
+## 動作確認済みフォント  
+###半角文字  
+misaki_4x8_iso8859.bdf  *1  
+misaki_4x8_jisx0201.bdf *1  
+3x8.bdf    *2  
+k6x10.bdf  *3  
 
-�A�h���X0x9DCC �X�y�[�X UTF8= E38080�`�AShift_JIS= 0x8140
+###全角文字  
+misaki_gothic.bdf *1  
+misaki_mincho.bdf *1  
+k6x8.bdf   *2  
+k12x10.bdf *3  
 
-�A�h���X0x11CCC "��" UTF8= E4B880�`�AShift_JIS= 0x88EA
+###入手元  
+*1) http://littlelimit.net/misaki.htm  
+X11 BDF 形式：misaki_bdf_2012-06-03.tar.gz (210,238 bytes)  
+*2) http://z.apps.atjp.jp/k12x10/  
+X11 bdf形式 (k12x10bdf.tar.gz, 155Kbyte)  
+*3) http://littlelimit.net/k6x8.htm  
+X11 BDF形式：k6x8bb02.tar.gz (86,333 bytes)  
 
-�A�h���X0x12BCC "��" UTF8= E58085�`�AShift_JIS= 0x98E4
+http://mplus-fonts.osdn.jp/mplus-bitmap-fonts/download/index.html
+http://openlab.ring.gr.jp/efont/shinonome/
 
-�A�h���X0x1AAC2 "��" UTF8= E6808E�`�AShift_JIS= 0x9C83
+##インストール方法  
+    lib/SlibJfont.lua  -- ライブラリ
+    lib/Utf8Euc_jp.tbl -- UTF-8をEUC-JPに変換する際の変換テーブル
+    bdf2sef.lua -- ファイル形式変換プログラム
+    sample.lua  -- サンプルプログラム
+をFlashAir内の好きな場所においてください。
 
-�A�h���X0x229A6 "�f" UTF8= E78081�`�AShift_JIS= 0xE066
+##使い方  
+###事前準備  
+アプリ実行時に、BDF形式を直接扱うのは効率が悪いので、事前に  
+BDF形式のフォントファイルを独自形式のフォントファイルに変換  
+しておきます。  
+変換プログラム(bdf2sef.lua)はLuaで書いてありますので、別途  
+環境を用意することなくFlashAir内で変換することができます。  
+フォントサイズにもよりますが、変換には数分かかります。
 
-�A�h���X0x2A8A4 "�s" UTF8= E88080�`�AShift_JIS= 0x9773
+###フォント  
+サンプルをご参照下さい。
 
-�A�h���X0x327A4 "��" UTF8= E98080�`�AShift_JIS= 0x91DE
-
-�A�h���X0x3A6A4 "�I" UTF8= EFBC81�`�AShift_JIS= 0x8149
-
-�A�h���X0x3A8DE "�`" UTF8= EFBD9E�AShift_JIS= 0x8160
-
-���p�J�i UTF8= EFBDA1�`EFBE9F ��ASCII�R�[�h�ɕϊ��B�Q�o�C�g�ڂ̓[���B
-
-
-JIS��ꐅ���A��񐅏��A�P�R�悪�ϊ��\
-
+###utf82euc()について
+UTF-8コードからEUC-JPコードに変換する関数は、mgo-tecさんの"SD_UTF8toSJIS"をアレンジさせていただきました。
+JIS第一水準、第二水準、１３区、半角カナが変換可能です。  
 
 ## Install
 
