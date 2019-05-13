@@ -4,7 +4,7 @@
 -- Copyright (c) 2019 AoiSaya
 -- Copyright (c) 2016 Mgo-tec
 -- Blog URL ---> https://www.mgo-tec.com
--- 2019/05/03 rev.0.05
+-- 2019/05/13 rev.0.07
 -----------------------------------------------
 local SlibJfont = {
 	fontList = {},
@@ -24,6 +24,7 @@ local SlibJfont = {
 --***********UTF-8コードをSD内の変換テーブルを読み出してEUC-JPコードに変換****
 function SlibJfont:utf82euc_code_cnv(utf8_1, utf8_2, utf8_3) --return: SD_addrs
 	local SD_addrs = 0xA1A1 --スペース
+
 	if utf8_1>=0xC2 and utf8_1<=0xD1 then
 		--0xB0からEUC-JPコード実データ。0x00-0xAFまではライセンス文ヘッダ。
 		SD_addrs = ((utf8_1*256 + utf8_2)-0xC2A2)*2 + 0xB0 --文字"¢" UTF8コード C2A2～
@@ -53,17 +54,63 @@ function SlibJfont:utf82euc_Table_Read(ff, addrs) --return: euc1, euc2
 end
 
 -- public functions --
+--***********Shit-JISコード文字列をEUC-JPコードに変換************************************
+function SlibJfont:sjis2euc(strSJIS) -- return strEUC, euc_length
+	local str_length = strSJIS:len()
+	local fnt_cnt = 1
+	local euc_cnt = 1
+	local ank_cnt = 0
+	local SJIS1, SJIS2, EUC1, EUC2, strEUC
+	local euc_byte = {}
+
+	while fnt_cnt<=str_length do
+		SJIS1 = strUTF8:byte(fnt_cnt)
+		fnt_cnt = fnt_cnt + 1
+
+		if SJIS1<0x80 then -- 1バイト文字
+			euc_byte[euc_cnt] = SJIS1
+			euc_cnt	= euc_cnt + 1
+			ank_cnt = ank_cnt + 1
+		elseif SJIS1>=0xAE and SJIS1<=0xDF then -- 半角カナ
+			euc_byte[euc_cnt]	= 0x8E
+			euc_byte[euc_cnt+1] = SJIS1
+			euc_cnt	= euc_cnt + 2
+			ank_cnt = ank_cnt + 1
+		else -- 2バイト文字
+			SJIS2 = strUTF8:byte(fnt_cnt)
+			fnt_cnt = fnt_cnt + 1
+			if SJIS1>=0xE0 then SJIS1 = SJIS1-0x40 end
+			if SJIS2>=0x80 then SJIS2 = SJIS2-1 end
+			EUC1 = (SJIS1-0x70)*2+0x80
+			EUC2 = SJIS2+3
+			if SJIS2<0x9E then
+				EUC1 = EUC1-1
+				EUC2 = EUC2+0x5E
+			end
+			euc_byte[euc_cnt]	= EUC1
+			euc_byte[euc_cnt+1] = EUC2
+			euc_cnt	= euc_cnt + 2
+			ank_cnt = ank_cnt + 2
+		end
+		sleep(0)
+	end
+	strEUC = string.char(unpack(euc_byte))
+	euc_byte = nil
+	collectgarbage()
+	return strEUC, ank_cnt
+end
+
 --***********UTF-8コード文字列をEUC-JPコードに変換************************************
 function SlibJfont:utf82euc(strUTF8) -- return strEUC, euc_length
-	local euc_cnt = 1
+	local str_length = strUTF8:len()
+	local fp_table
 	local fnt_cnt = 1
+	local euc_cnt = 1
 	local ank_cnt = 0
+	local utf8_byte
 	local sp_addres = 0xA1A1 --スペース
 	local EUC1, EUC2, strEUC
-	local fp_table
-	local utf8_byte
 	local euc_byte = {}
-	local str_length = strUTF8:len()
 
 --	local UTF8EUC_file = "Utf8Euc.tbl"
 --	local fp_table = io.open(UTF8EUC_file, "rb")
@@ -91,10 +138,9 @@ function SlibJfont:utf82euc(strUTF8) -- return strEUC, euc_length
 			euc_byte[euc_cnt+1] = EUC2
 			euc_cnt	= euc_cnt + 2
 			fnt_cnt = fnt_cnt + 3
+			ank_cnt = ank_cnt + 2
 			if EUC1==0x8E then --EUC-JPで半角カナコードが返ってきた場合の対処
-				ank_cnt = ank_cnt + 1
-			else
-				ank_cnt = ank_cnt + 2
+				ank_cnt = ank_cnt - 1
 			end
 		elseif utf8_byte>=0x20 and utf8_byte<=0x7E then
 			euc_byte[euc_cnt] = utf8_byte
@@ -116,11 +162,14 @@ function SlibJfont:utf82euc(strUTF8) -- return strEUC, euc_length
 end
 
 function SlibJfont:open(fontPath, convTablePath)
-	local fp,header
+	local fp, header
 	local font={}
 
 	if convTablePath then
 		fp = io.open(convTablePath, "rb")
+		if not fp then
+			return nil, "Can't open table file!"
+		end
 		self.fp = fp
 	end
 
@@ -133,7 +182,7 @@ function SlibJfont:open(fontPath, convTablePath)
 		return nil, "Not FONT.SLF format file!"
 	end
 
-	font.fp = fp
+	font.fp 	= fp
 	font.getFont= self.getFont
 	font.format= header:sub(1,3)
 	font.hsize = tonumber(header:sub( 4, 6),16)
@@ -152,6 +201,12 @@ end
 function SlibJfont:close(font)
 	if font then
 		font.fp:close()
+		for key,v in pairs(self.fontList) do
+			if font==v then
+				table.remove(self.fontList,key)
+				break
+			end
+		end
 		font = nil
 	else
 		self.fp:close()
@@ -159,6 +214,7 @@ function SlibJfont:close(font)
 			font.fp:close()
 			font = nil
 		end
+		self.fontList = {}
 	end
 	collectgarbage()
 
@@ -176,9 +232,9 @@ end
 
 function SlibJfont:getFont(euc, p)
 	local p = p or 1
-	local bitmap={}
-	local c, d, font, ank
-	local fp, hnum, ofs, pos, fh, fw
+	local c, d, font, ank, data
+	local fp, hnum, fh, ofs, pos, fw
+	local bitmap = {}
 
 	c,d = euc:byte(p,p+1)
 	if c>0x8E then
@@ -195,7 +251,7 @@ function SlibJfont:getFont(euc, p)
 		ank = 1
 	end
 
-    fp   = font.fp
+	fp	 = font.fp
 	hnum = font.hnum
 	fh = font.height
 	if fp then
@@ -203,13 +259,23 @@ function SlibJfont:getFont(euc, p)
 		pos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font.size+font.hsize
 
 		fp:seek("set", pos)
-		fw = tonumber(fp:read(2),16)
-        for i=1,fw do
+        data = fp:read(2)
+        if not data then
+			ofs = 0xA1A1-font.ofs
+			pos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font.size+font.hsize
+			fp:seek("set", pos)
+	        data = fp:read(2)
+        end
+        fw = tonumber(data,16)
+		for i=1,fw do
 			bitmap[i] = tonumber(fp:read(hnum),16)
 		end
 	else
 		c = ank and string.char(c) or c
 		bitmap, fw = self.font[c], font.width
+		if not bitmap then
+            bitmap, fw = self.font[" "], font.width
+        end
 	end
 
 	return bitmap, fh, fw, p
