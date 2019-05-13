@@ -1,7 +1,7 @@
 -------------------------------------------------------
 -- bdf2sef.lua for FlashAir W4.00.03
 -- *.SEF(Saya Euc Font format) is original format based on EUC
--- 2019/05/13 rev.0.3
+-- 2019/05/14 rev.0.4
 -------------------------------------------------------
 function chkBreak(n)
 	sleep(n or 0)
@@ -53,9 +53,9 @@ function convBdf2Bin(srcFname,dstFname,byte)
 
 	bbw, bbh, box, boy = getData(sfh, "^FONTBOUNDINGBOX%s+(%w+)%s+(%w+)%s+(-?%w+)%s+(-?%w+)",10)
 	chars  = getData(sfh, "^CHARS%s+(%w+)",10)
-	ndeg   = ba(bbh+3,0xFFFFFFF0)
+	ndeg   = bx(bbh+3,2,30)
 	sz	   = ndeg * bbw + 3
-	blank  = string.format("%02X",bw)..string.rep("0", sz-3) .. "\n"
+	blank  = string.format("%02X",bbw)..string.rep("0", sz-3) .. "\n"
 	char_base = (byte==1) and 0x00 or 0x2121+0x8080
 	char_next = char_base
 	header_size = 64
@@ -69,7 +69,7 @@ function convBdf2Bin(srcFname,dstFname,byte)
 --	for i=1, 100 do
 		chkBreak()
 		collectgarbage()
-		char  = getData(sfh, "^STARTCHAR%s+(%w+)",16)
+		char  = getData(sfh, "^ENCODING%s+(%w+)",10)
 		if byte==2 then
 			char = char+0x8080
 		end
@@ -90,9 +90,9 @@ function convBdf2Bin(srcFname,dstFname,byte)
 		for k=1, bbw do
 			bin[k] = 0
 		end
-		u = 2^(fbh+foy-(bbh+boy))
-		bm = ba(fbw+7,0xFFFFFF00)
-		for j= 1, bh do
+		u = 2^(bbh+boy-(fbh+foy))
+		bm = ba(fbw+7,0xFFFFFFF8)
+		for j= 1, fbh do
 			d = getData(sfh, "(%w+)",16)
 			for k=1, fbw do
 				bin[k+fox] = bin[k+fox]+bx(d,bm-k)*u
@@ -135,11 +135,13 @@ convBdf2Bin(srcFname,dstFname,1)
 local srcFname = myDir .. "k12x10.bdf"
 local dstFname = myDir .. "k12x10.sef"
 convBdf2Bin(srcFname,dstFname,2)
---]]
 local srcFname = myDir .. "3x8.bdf"
 local dstFname = myDir .. "3x8.sef"
 convBdf2Bin(srcFname,dstFname,1)
-
 local srcFname = myDir .. "shnmk12p.bdf"
 local dstFname = myDir .. "shnmk12p.sef"
 convBdf2Bin(srcFname,dstFname,2)
+--]]
+local srcFname = myDir .. "mplus_q06r.bdf"
+local dstFname = myDir .. "mplus_q06r.sef"
+convBdf2Bin(srcFname,dstFname,1)
