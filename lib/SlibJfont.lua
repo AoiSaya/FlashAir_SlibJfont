@@ -4,7 +4,7 @@
 -- Copyright (c) 2019 AoiSaya
 -- Copyright (c) 2016 Mgo-tec
 -- Blog URL ---> https://www.mgo-tec.com
--- 2019/05/13 rev.0.07
+-- 2019/05/14 rev.0.08
 -----------------------------------------------
 local SlibJfont = {
 	fontList = {},
@@ -64,20 +64,20 @@ function SlibJfont:sjis2euc(strSJIS) -- return strEUC, euc_length
 	local euc_byte = {}
 
 	while fnt_cnt<=str_length do
-		SJIS1 = strUTF8:byte(fnt_cnt)
+		SJIS1 = strSJIS:byte(fnt_cnt)
 		fnt_cnt = fnt_cnt + 1
 
 		if SJIS1<0x80 then -- 1バイト文字
 			euc_byte[euc_cnt] = SJIS1
 			euc_cnt	= euc_cnt + 1
 			ank_cnt = ank_cnt + 1
-		elseif SJIS1>=0xAE and SJIS1<=0xDF then -- 半角カナ
+		elseif SJIS1>=0xA1 and SJIS1<=0xDF then -- 半角カナ
 			euc_byte[euc_cnt]	= 0x8E
 			euc_byte[euc_cnt+1] = SJIS1
 			euc_cnt	= euc_cnt + 2
 			ank_cnt = ank_cnt + 1
 		else -- 2バイト文字
-			SJIS2 = strUTF8:byte(fnt_cnt)
+			SJIS2 = strSJIS:byte(fnt_cnt)
 			fnt_cnt = fnt_cnt + 1
 			if SJIS1>=0xE0 then SJIS1 = SJIS1-0x40 end
 			if SJIS2>=0x80 then SJIS2 = SJIS2-1 end
@@ -200,7 +200,7 @@ end
 
 function SlibJfont:close(font)
 	if font then
-		font.fp:close()
+		if self.fp then self.fp:close() end
 		for key,v in pairs(self.fontList) do
 			if font==v then
 				table.remove(self.fontList,key)
@@ -209,7 +209,7 @@ function SlibJfont:close(font)
 		end
 		font = nil
 	else
-		self.fp:close()
+		if self.fp then self.fp:close() end
 		for key,font in pairs(self.fontList) do
 			font.fp:close()
 			font = nil
@@ -222,10 +222,18 @@ function SlibJfont:close(font)
 end
 
 function SlibJfont:setFont(font1,font2)
+	local ofs
+
 	if font1 then
+		ofs = 0x20-font1.ofs
+		font1.spos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font1.size+font1.hsize
+
 		self.font1 = font1
 	end
 	if font2 then
+		ofs = 0xA1A1-font2.ofs
+		font2.spos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font2.size+font2.hsize
+
 		self.font2 = font2
 	end
 end
@@ -253,20 +261,17 @@ function SlibJfont:getFont(euc, p)
 
 	fp	 = font.fp
 	hnum = font.hnum
-	fh = font.height
+	fh	 = font.height
 	if fp then
 		ofs = c-font.ofs
 		pos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font.size+font.hsize
-
 		fp:seek("set", pos)
-        data = fp:read(2)
-        if not data then
-			ofs = 0xA1A1-font.ofs
-			pos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font.size+font.hsize
-			fp:seek("set", pos)
-	        data = fp:read(2)
-        end
-        fw = tonumber(data,16)
+		data = fp:read(2)
+		if not data then
+			fp:seek("set", font.spos)
+			data = fp:read(2)
+		end
+		fw = tonumber(data,16)
 		for i=1,fw do
 			bitmap[i] = tonumber(fp:read(hnum),16)
 		end
@@ -274,8 +279,8 @@ function SlibJfont:getFont(euc, p)
 		c = ank and string.char(c) or c
 		bitmap, fw = self.font[c], font.width
 		if not bitmap then
-            bitmap, fw = self.font[" "], font.width
-        end
+			bitmap, fw = self.font[ank and " " or 0xA1A1], font.width
+		end
 	end
 
 	return bitmap, fh, fw, p

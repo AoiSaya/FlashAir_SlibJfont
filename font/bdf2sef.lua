@@ -9,6 +9,10 @@ function chkBreak(n)
 		error("Break!",2)
 	end
 end
+function putMessage(msg)
+  	fa.sharedmemory("write", 0x01, 0xFE, msg)
+end
+
 fa.sharedmemory("write", 0x00, 0x01, "-")
 
 function script_path()
@@ -40,6 +44,8 @@ function convBdf2Bin(srcFname,dstFname,byte)
 	local rev = 3
 	local ba = bit32.band
 	local bx = bit32.extract
+	local ratio = 0
+	local left
 
 	sfh = io.open(srcFname,"r")
 	if not sfh then
@@ -65,6 +71,7 @@ function convBdf2Bin(srcFname,dstFname,byte)
 	buf = string.rep(" ", header_size-#buf-1).."\n"
 	dfh:write(buf)
 
+	t = os.clock()
 	for i=1, chars do
 --	for i=1, 100 do
 		chkBreak()
@@ -104,6 +111,11 @@ function convBdf2Bin(srcFname,dstFname,byte)
 			dfh:write(string.format("%0"..ndeg.."X",bin[k]))
 		end
 		dfh:write("\n")
+		if ratio <= i*100/chars then
+			left = math.ceil((os.clock()-t)*(100-ratio)/ratio)
+			putMessage(ratio.."%, Time remaining: About "..left.." seconds")
+			ratio = ratio+1
+		end
 	end
 
 	sfh:close()
@@ -120,10 +132,7 @@ convBdf2Bin(srcFname,dstFname,1)
 local srcFname = myDir .. "misaki_4x8_jisx0201.bdf"
 local dstFname = myDir .. "misaki_4x8_jisx0201.sef"
 convBdf2Bin(srcFname,dstFname,1)
-local srcFname = myDir .. "misaki_gothic.bdf"
-local dstFname = myDir .. "misaki_gothic.sef"
-convBdf2Bin(srcFname,dstFname,2)
-ocal srcFname = myDir .. "misaki_mincho.bdf"
+local srcFname = myDir .. "misaki_mincho.bdf"
 local dstFname = myDir .. "misaki_mincho.sef"
 convBdf2Bin(srcFname,dstFname,2)
 local srcFname = myDir .. "k6x8.bdf"
@@ -141,7 +150,10 @@ convBdf2Bin(srcFname,dstFname,1)
 local srcFname = myDir .. "shnmk12p.bdf"
 local dstFname = myDir .. "shnmk12p.sef"
 convBdf2Bin(srcFname,dstFname,2)
---]]
 local srcFname = myDir .. "mplus_q06r.bdf"
 local dstFname = myDir .. "mplus_q06r.sef"
 convBdf2Bin(srcFname,dstFname,1)
+--]]
+local srcFname = myDir .. "misaki_gothic.bdf"
+local dstFname = myDir .. "misaki_gothic.sef"
+convBdf2Bin(srcFname,dstFname,2)

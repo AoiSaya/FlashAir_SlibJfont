@@ -22,18 +22,18 @@ local myDir  = script_path()
 local libDir = myDir.."lib/"
 local fontDir= myDir.."font/"
 local jfont  = require(libDir .. "SlibJfont")
-local k12x10 = jfont:open(fontDir .. "k12x10.sef", libDir .. "Utf8Euc_jp.tbl")
-local shnmk12p = jfont:open(fontDir .. "shnmk12p.sef", libDir .. "Utf8Euc_jp.tbl")
+local k12x10 = jfont:open(fontDir .. "k12x10.sef")
+local shnmk12p = jfont:open(fontDir .. "shnmk12p.sef")
 local k6x10  = jfont:open(fontDir .. "k6x10.sef")
 local mplus_q06r  = jfont:open(fontDir .. "mplus_q06r.sef")
 local str={
-  "ï¼µï¼´ï¼¦ï¼˜â†’ï¼¥ï¼µï¼£ã€€å…¨è§’æ—¥æœ¬èªæ¼¢å­—å¤‰æ›ãƒ†ã‚¹ãƒˆè¡¨",
-  "ã€ã€‚ã€ƒÂ¢â€ã€€ä¸€å€…æ€ç€è€€é€€ï¼ï¿¥ç†™ï½",
-  "â€»ã€’â„ƒâ‡’â‡”â™ªÎ©Î±Î²Î³Î¸Ï€Ï†â—â—‹â—â—†â—‡â– â–¡â˜…â˜†", --ã‚ˆãä½¿ã‚ã‚Œã‚‹è¨˜å·
-  "â‘ â‘¡â‘¢â‘£â‘¤â‘¥â‘¦â‘§â‘¨â‘©â‘ªâ‘«â‘¬â‘­â‘®â‘¯â‘°â‘±â‘²â‘³â… â…¡â…¢â…£â…¤â…¥â…¦â…§â…¨â…©", --JIS ï¼‘ï¼“åŒºæ–‡å­—
-  "ã‰ãŒ”ãŒ¢ããŒ˜ãŒ§ãŒƒãŒ¶ã‘ã—ãŒãŒ¦ãŒ£ãŒ«ãŠãŒ»ãœããããã„ã¡ã€ã€Ÿâ„–ãâ„¡", --JIS ï¼‘ï¼“åŒºæ–‡å­—
-  "ãŠ¤ãŠ¥ãŠ¦ãŠ§ãŠ¨ãˆ±ãˆ²ãˆ¹ã¾ã½ã¼ã»âˆ®âˆ‘âˆŸâŠ¿âˆªâˆ©âˆ âŠ¥â‰¡â‰’âˆšâˆµâˆ«", --JIS ï¼‘ï¼“åŒºæ–‡å­—
-  "åŠè§’/ABC å…¨è§’/ï¼¡ï¼¢ï¼£ã€€åŠè§’ã‚«ãƒŠ/ï½±ï½¶ï½»ï¾€ï¾…ï¾œï½¦ï¾ ï½¶ï¾ï¾Šï¾Ÿ ï½§ï½¨ï½©ï½ªï½«ï½¬ï½­ï½®"
+  "‚t‚s‚e‚W¨‚d‚t‚b@‘SŠp“ú–{ŒêŠ¿š•ÏŠ·ƒeƒXƒg•\",
+  "ABV‘]@ˆê˜äœƒàf—s‘ŞIê¤`",
+  "¦§ËÌôƒ¶ƒ¿ƒÀƒÁƒÆƒÎƒÓœ›Ÿ¡ š™", --‚æ‚­g‚í‚ê‚é‹L†
+  "‡@‡A‡B‡C‡D‡E‡F‡G‡H‡I‡J‡K‡L‡M‡N‡O‡P‡Q‡R‡S‡T‡U‡V‡W‡X‡Y‡Z‡[‡\‡]", --JIS ‚P‚R‹æ•¶š
+  "‡_‡`‡a‡b‡c‡d‡e‡f‡g‡h‡i‡j‡k‡l‡m‡n‡o‡p‡q‡r‡s‡t‡u‡€‡‡‚‡ƒ‡„", --JIS ‚P‚R‹æ•¶š
+  "‡…‡†‡‡‡ˆ‡‰‡Š‡‹‡Œ‡‡‡‡~‡“‡”‡˜‡™¾¿ÚÛßàãæç", --JIS ‚P‚R‹æ•¶š
+  "”¼Šp/ABC ‘SŠp/‚`‚a‚b@”¼ŠpƒJƒi/±¶»ÀÅÜ¦İ ¶ŞÊß §¨©ª«¬­®"
 }
 
 local EUC_file = "sample_out.txt"
@@ -47,8 +47,8 @@ jfont:setFont(mplus_q06r,shnmk12p)
 
 kmax = jfont.font2.height
 
-for key,strUTF8 in ipairs(str) do
-	strEUC, euc_length = jfont:utf82euc(strUTF8)
+for key,strSJIS in ipairs(str) do
+	strEUC, euc_length = jfont:sjis2euc(strSJIS)
 	s = {}
 	for k=1, kmax do
 		s[k] = ""
