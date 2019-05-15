@@ -162,7 +162,7 @@ function SlibJfont:utf82euc(strUTF8) -- return strEUC, euc_length
 end
 
 function SlibJfont:open(fontPath, convTablePath)
-	local fp, header
+	local fp, header, ofs
 	local font={}
 
 	if convTablePath then
@@ -192,6 +192,8 @@ function SlibJfont:open(fontPath, convTablePath)
 	font.size  = tonumber(header:sub(13,15),16)
 	font.ofs   = tonumber(header:sub(16,19),16)
 	font.hnum  = math.floor((font.height+3)/4)
+	ofs = ((font.ofs<0x100) and 0x20 or 0xA1A1)-font.ofs
+	font.spos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font.size+font.hsize
 
 	table.insert(self.fontList,font)
 	collectgarbage()
@@ -217,23 +219,15 @@ function SlibJfont:close(font)
 		self.fontList = {}
 	end
 	collectgarbage()
-
-	return "OK"
 end
 
 function SlibJfont:setFont(font1,font2)
 	local ofs
 
 	if font1 then
-		ofs = 0x20-font1.ofs
-		font1.spos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font1.size+font1.hsize
-
 		self.font1 = font1
 	end
 	if font2 then
-		ofs = 0xA1A1-font2.ofs
-		font2.spos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font2.size+font2.hsize
-
 		self.font2 = font2
 	end
 end
