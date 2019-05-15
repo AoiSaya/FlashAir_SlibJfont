@@ -51,9 +51,9 @@ http://openlab.ring.gr.jp/efont/shinonome/
     lib/SlibJfont.lua  -- ライブラリ  
     lib/Utf8Euc_jp.tbl -- UTF-8をEUC-JPに変換する際の変換テーブル  
     font/bdf2sef.lua   -- ファイル形式変換プログラム  
-    sample.lua		-- UTF-8サンプルプログラム  
-    sample_jis.lua	-- Shift-JISサンプルプログラム  
-    sample_jis.txt	-- Shift-JISプログラム  
+    sample.lua         -- UTF-8サンプルプログラム  
+    sample_jis.lua     -- Shift-JISサンプルプログラム  
+    sample_jis.txt     -- Shift-JISプログラム  
 上記をFlashAir内の好きな場所においてください  
 
 ## getFont()で取得できるbitmapのフォーマット  
