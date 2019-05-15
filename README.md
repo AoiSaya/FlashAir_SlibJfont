@@ -121,12 +121,12 @@ JIS第一水準、第二水準、１３区、半角カナが変換可能です�
 
 ### サンプルコード  
 
-    sample.lua		-- UTF-8サンプルプログラム  
-    sample_jis.lua	-- Shift-JISサンプルプログラム  
-    sample_jis.txt	-- Shift-JISプログラム  
+    sample.lua      -- UTF-8文字列のサンプルプログラム  
+    sample_jis.lua  -- Shift-JIS文字列のサンプルプログラム  
+    sample_jis.txt  -- Shift-JIS文字列テキスト  
 
-BDFフォントファイル "k6x10.bdf" と "k12x10.bdf" を *3) から入手して  
-font/ の下に置き、bdf2sef.lua に  
+BDFフォントファイル "k6x10.bdf" と "k12x10.bdf" を *3)* から入手して  
+font/ の下に置き、bdf2sef.lua の末尾に  
 
     convBdf2Bin("k6x10.bdf")  
     convBdf2Bin("k12x10.bdf")  
@@ -134,7 +134,7 @@ font/ の下に置き、bdf2sef.lua に
 を追加してください。  
 bdf2sef.lua を実行すると、"k6x10.sef" と "k12x10.sef" が生成されます。  
 .sefファイルがある状態で、sample.lua または、sample_jis.lua を実行すると、  
-sample_out.txt ファイルに文字列に対応したバナーが出力されます。  
+文字列に対応したバナーが sample_out.txt ファイルに出力されます。  
 
 
 ## Licence  
