@@ -4,7 +4,7 @@
 -- Copyright (c) 2019 AoiSaya
 -- Copyright (c) 2016 Mgo-tec
 -- Blog URL ---> https://www.mgo-tec.com
--- 2019/05/14 rev.0.08
+-- 2019/05/15 rev.0.09
 -----------------------------------------------
 local SlibJfont = {
 	fontList = {},
@@ -267,7 +267,7 @@ function SlibJfont:getFont(euc, p)
 		pos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font.size+font.hsize
 		fp:seek("set", pos)
 		data = fp:read(2)
-		if not data then
+		if not data or ofs<0 then
 			fp:seek("set", font.spos)
 			data = fp:read(2)
 		end

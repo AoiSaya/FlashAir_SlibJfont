@@ -1,7 +1,7 @@
 -------------------------------------------------------
 -- bdf2sef.lua for FlashAir W4.00.03
 -- *.SEF(Saya Euc Font format) is original format based on EUC
--- 2019/05/14 rev.0.4
+-- 2019/05/15 rev.0.5
 -------------------------------------------------------
 function chkBreak(n)
 	sleep(n or 0)
@@ -10,7 +10,7 @@ function chkBreak(n)
 	end
 end
 function putMessage(msg)
-  	fa.sharedmemory("write", 0x01, 0xFE, msg)
+	fa.sharedmemory("write", 0x01, 0xFE, msg)
 end
 
 fa.sharedmemory("write", 0x00, 0x01, "-")
@@ -35,7 +35,7 @@ function getData(sfh,format,base)
 	return table.unpack(ret)
 end
 
-function convBdf2Bin(srcFname,dstFname,byte)
+function convBdf2Bin(srcFname,dstFname)
 	local sfh, dfh
 	local bbw, bbh, box, boy, ndeg, sz, blank, chars, charL
 	local char, char_next, char_base, buf, bin, d, u
@@ -45,16 +45,29 @@ function convBdf2Bin(srcFname,dstFname,byte)
 	local ba = bit32.band
 	local bx = bit32.extract
 	local ratio = 0
-	local left
+	local left, mes, Fname
 
 	sfh = io.open(srcFname,"r")
 	if not sfh then
-		return nil, "Can't open "..'"'..srcFname..'".'
+		Fname = script_path()..srcFname
+		sfh = io.open(Fname,"r")
+		if not sfh then
+			mes = "Can't open "..'"'..srcFname..'".'
+			putMessage(mes)
+			return nil, mes
+		end
+		srcFname = Fname
+	end
+
+	if not dstFname then
+		dstFname = srcFname:gsub("[^\\.]*$","sef",1)
 	end
 	dfh = io.open(dstFname,"wb")
 	if not dfh then
 		sfh:close()
-		return nil, "Can't open "..'"'..dstFname..'".'
+		mes = "Can't open "..'"'..dstFname..'".'
+		putMessage(mes)
+		return nil, mes
 	end
 
 	bbw, bbh, box, boy = getData(sfh, "^FONTBOUNDINGBOX%s+(%w+)%s+(%w+)%s+(-?%w+)%s+(-?%w+)",10)
@@ -62,21 +75,27 @@ function convBdf2Bin(srcFname,dstFname,byte)
 	ndeg   = bx(bbh+3,2,30)
 	sz	   = ndeg * bbw + 3
 	blank  = string.format("%02X",bbw)..string.rep("0", sz-3) .. "\n"
-	char_base = (byte==1) and 0x00 or 0x2121+0x8080
-	char_next = char_base
 	header_size = 64
-
-	buf = string.format(head.."%3X%2X%2X%2X%3X%4X\n",header_size,rev,bbw,bbh,sz,char_base)
-	dfh:write(buf)
-	buf = string.rep(" ", header_size-#buf-1).."\n"
-	dfh:write(buf)
 
 	t = os.clock()
 	for i=1, chars do
---	for i=1, 100 do
 		chkBreak()
 		collectgarbage()
 		char  = getData(sfh, "^ENCODING%s+(%w+)",10)
+		if i==1 then
+			if char<0x100 then
+				byte = 1
+				char_base = char
+			else
+				byte = 2
+				char_base = ba(char,0xFF00)+0x0021+0x8080
+			end
+			char_next = char_base
+			buf = string.format(head.."%3X%2X%2X%2X%3X%4X\n",header_size,rev,bbw,bbh,sz,char_base)
+			dfh:write(buf)
+			buf = string.rep(" ", header_size-#buf-1).."\n"
+			dfh:write(buf)
+		end
 		if byte==2 then
 			char = char+0x8080
 		end
@@ -113,7 +132,7 @@ function convBdf2Bin(srcFname,dstFname,byte)
 		dfh:write("\n")
 		if ratio <= i*100/chars then
 			left = math.ceil((os.clock()-t)*(100-ratio)/ratio)
-			putMessage(ratio.."%, Time remaining: About "..left.." seconds")
+			putMessage('"'..dstFname:match("[^/]*$")..'": '..ratio.."%, Time remaining: About "..left.." seconds")
 			ratio = ratio+1
 		end
 	end
@@ -122,38 +141,17 @@ function convBdf2Bin(srcFname,dstFname,byte)
 	dfh:close()
 end
 
-
-local myDir  = script_path()
+-- main ----------------------------------------------------------------
 
 --[[
-local srcFname = myDir .. "misaki_4x8_iso8859.bdf"
-local dstFname = myDir .. "misaki_4x8_iso8859.sef"
-convBdf2Bin(srcFname,dstFname,1)
-local srcFname = myDir .. "misaki_4x8_jisx0201.bdf"
-local dstFname = myDir .. "misaki_4x8_jisx0201.sef"
-convBdf2Bin(srcFname,dstFname,1)
-local srcFname = myDir .. "misaki_mincho.bdf"
-local dstFname = myDir .. "misaki_mincho.sef"
-convBdf2Bin(srcFname,dstFname,2)
-local srcFname = myDir .. "k6x8.bdf"
-local dstFname = myDir .. "k6x8.sef"
-convBdf2Bin(srcFname,dstFname,2)
-local srcFname = myDir .. "k6x10.bdf"
-local dstFname = myDir .. "k6x10.sef"
-convBdf2Bin(srcFname,dstFname,1)
-local srcFname = myDir .. "k12x10.bdf"
-local dstFname = myDir .. "k12x10.sef"
-convBdf2Bin(srcFname,dstFname,2)
-local srcFname = myDir .. "3x8.bdf"
-local dstFname = myDir .. "3x8.sef"
-convBdf2Bin(srcFname,dstFname,1)
-local srcFname = myDir .. "shnmk12p.bdf"
-local dstFname = myDir .. "shnmk12p.sef"
-convBdf2Bin(srcFname,dstFname,2)
-local srcFname = myDir .. "mplus_q06r.bdf"
-local dstFname = myDir .. "mplus_q06r.sef"
-convBdf2Bin(srcFname,dstFname,1)
+convBdf2Bin("misaki_4x8_iso8859.bdf")
+convBdf2Bin("misaki_4x8_jisx0201.bdf")
+convBdf2Bin("misaki_mincho.bdf")
+convBdf2Bin("misaki_gothic.bdf")
+convBdf2Bin("k6x8.bdf")
+convBdf2Bin("k6x10.bdf")
+convBdf2Bin("k12x10.bdf")
+convBdf2Bin("3x8.bdf")
+convBdf2Bin("shnmk12p.bdf")
+convBdf2Bin("mplus_q06r.bdf")
 --]]
-local srcFname = myDir .. "misaki_gothic.bdf"
-local dstFname = myDir .. "misaki_gothic.sef"
-convBdf2Bin(srcFname,dstFname,2)

@@ -2,7 +2,7 @@
 -- Sample of SlibJfont.lua for W4.00.03
 -- Copyright (c) 2019, Saya
 -- All rights reserved.
--- 2019/05/02 rev.0.01
+-- 2019/05/15 rev.0.02
 -----------------------------------------------
 function chkBreak(n)
 	sleep(n or 0)
@@ -23,9 +23,7 @@ local libDir = myDir.."lib/"
 local fontDir= myDir.."font/"
 local jfont  = require(libDir .. "SlibJfont")
 local k12x10 = jfont:open(fontDir .. "k12x10.sef", libDir .. "Utf8Euc_jp.tbl")
-local shnmk12p = jfont:open(fontDir .. "shnmk12p.sef", libDir .. "Utf8Euc_jp.tbl")
 local k6x10  = jfont:open(fontDir .. "k6x10.sef")
-local mplus_q06r  = jfont:open(fontDir .. "mplus_q06r.sef")
 local str={
   "ＵＴＦ８→ＥＵＣ　全角日本語漢字変換テスト表",
   "、。〃¢‐　一倅怎瀁耀退！￥熙～",
@@ -37,13 +35,12 @@ local str={
 }
 
 local EUC_file = "sample_out.txt"
-local fhw = io.open(myDir..EUC_file, "w")
+local fpw = io.open(myDir..EUC_file, "w")
 local strUTF8, strEUC, euc_length
 local bitmap, fh, fw, s, p, kmax
 local be = bit32.extract
 
---jfont:setFont(k6x10,k12x10)
-jfont:setFont(mplus_q06r,shnmk12p)
+jfont:setFont(k6x10,k12x10)
 
 kmax = jfont.font2.height
 
@@ -63,13 +60,13 @@ for key,strUTF8 in ipairs(str) do
 		end
 	end
 	for k=1, kmax do
-		fhw:write(s[k], "\n")
+		fpw:write(s[k], "\n")
 	end
-	fhw:write("\n")
+	fpw:write("\n")
 	chkBreak()
 	collectgarbage()
 end
 
-fhw:close()
+fpw:close()
 jfont:close()
 return
