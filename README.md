@@ -147,7 +147,7 @@ bdf2sef.lua を実行すると、font/ の下に"k6x10.sef" と "k12x10.sef" が
 
 ## Licence  
 
-[MIT](https://github.com/AoiSaya/FlashAir-SlibJFont/blob/master/LICENSE)  
+[MIT](https://github.com/AoiSaya/FlashAir_SlibJFont/blob/master/LICENSE)  
 
 ## Author  
 
