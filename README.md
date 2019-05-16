@@ -52,8 +52,8 @@ http://openlab.ring.gr.jp/efont/shinonome/
     lib/Utf8Euc_jp.tbl -- UTF-8をEUC-JPに変換する際の変換テーブル  
     font/bdf2sef.lua   -- ファイル形式変換プログラム  
     sample.lua         -- UTF-8サンプルプログラム  
-    sample_jis.lua     -- Shift-JISサンプルプログラム  
-    sample_jis.txt     -- Shift-JISプログラム  
+    sample_sjis.lua     -- Shift-JISサンプルプログラム  
+    sample_sjis.txt     -- Shift-JISプログラム  
 上記をFlashAir内の好きな場所においてください  
 
 ## getFont()で取得できるbitmapのフォーマット  
@@ -134,8 +134,8 @@ function script_path() で取得できます。
     lib/Utf8Euc_jp.tbl -- UTF-8をEUC-JPに変換する際の変換テーブル  
     font/bdf2sef.lua   -- ファイル形式変換プログラム  
     sample.lua         -- UTF-8サンプルプログラム  
-    sample_jis.lua     -- Shift-JISサンプルプログラム  
-    sample_jis.txt     -- Shift-JISプログラム  
+    sample_sjis.lua     -- Shift-JISサンプルプログラム  
+    sample_sjis.txt     -- Shift-JISプログラム  
 
 BDFフォントファイル "k6x10.bdf" と "k12x10.bdf" を *3)* から入手して  
 font/ の下に置き、bdf2sef.lua の末尾に  
@@ -145,7 +145,7 @@ font/ の下に置き、bdf2sef.lua の末尾に
 
 を追加してください。  
 bdf2sef.lua を実行すると、font/ の下に"k6x10.sef" と "k12x10.sef" が生成されます。  
-.sef ファイルがある状態で、sample.lua または、sample_jis.lua を実行すると、  
+.sef ファイルがある状態で、sample.lua または、sample_sjis.lua を実行すると、  
 文字列に対応したバナーが sample_out.txt ファイルに出力されます。  
 
 
