@@ -1,7 +1,7 @@
 -------------------------------------------------------
 -- bdf2sef.lua for FlashAir W4.00.03
 -- *.SEF(Saya Euc Font format) is original format based on EUC
--- 2019/05/15 rev.0.5
+-- 2019/05/16 rev.0.6
 -------------------------------------------------------
 function chkBreak(n)
 	sleep(n or 0)
@@ -139,6 +139,9 @@ function convBdf2Bin(srcFname,dstFname)
 
 	sfh:close()
 	dfh:close()
+
+	collectgarbage()
+	return "OK"
 end
 
 -- main ----------------------------------------------------------------
