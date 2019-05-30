@@ -3,6 +3,10 @@
 これはFlashAirで日本語フォントを扱うためのライブラリです。  
 UTF-8やShift-JIS、EUC-JP文字に対応するビットマップデータを取得できます。  
 
+2019/05/30 rev.0.10    
+Utf8Euc_jp.tblの指定を不要にしました。    
+フォントファイルはカレントフォルダとカレント/font/をサーチするようにしました。    
+
 ## 動作確認済みフォント  
 フォント本体は収録していませんので、BDF形式のビットマップフォントを別途ご用意ください。  
 縦×横が32dot x 32dot以下のJIS並びのBDFフォントを想定して作成しています。  
@@ -114,7 +118,7 @@ ret,mes=<BR> convBdf2Bin(srcFname,dstFname) |  **BDF形式のビットマップ�
 --- | ---  
 strEUC, ank_cnt=<BR> SlibJfont:sjis2euc(strSJIS) | **Shit-JISコード文字列をEUC-JPコードに変換します**<BR>**strEUC:** EUC文字列<BR>**ank_cnt**: 半角文字単位で数えた文字数<BR>**strSJIS:** Shift-JIS文字列  
 strEUC, ank_cnt=<BR> SlibJfont:utf82euc(strUTF8) | **UTF-8コード文字列をEUC-JPコードに変換します**<BR>**strEUC:** EUC文字列<BR>**ank_cnt**: 半角文字単位で数えた文字数<BR>**strUTF8:** UTF-8文字列  
-font,mes = SlibJfont:open(fontPath, convTablePath) | **フォントファイルをオープンし、管理情報を取得します**<BR>**font:** フォント管理情報、ファイルオープンに失敗した場合は nil<BR>**mes:** エラーメッセージ<BR>**fontPath:** .sef形式のフォントファイル名(フルパス)<BR>**convTablePath:** " Utf8Euc_jp.tbl"をフルパスで指定、utf82euc()を使用しないときや2回目以降は省略可  
+font,mes = SlibJfont:open(fontPath) | **フォントファイルをオープンし、管理情報を取得します**<BR>**font:** フォント管理情報、ファイルオープンに失敗した場合は nil<BR>**mes:** エラーメッセージ<BR>**fontPath:** .sef形式のフォントファイル名またはパス名<BR>見つからない場合はカレント/font/の下をさがします
 SlibJfont:close(font) | **フォントファイルをクローズします**<BR>**font:** フォント管理情報、省略すると全てクローズ  
 SlibJfont:setFont(font1,font2) | **getFont()で使用するフォントを指定します**<BR>**font1:** 半角文字用フォント管理情報、変更しないときは省略可<BR>**font2:** 全角文字用フォント管理情報、変更しないときは省略可  
 bitmap, fh, fw, next_p =<BR> SlibJfont:getFont(euc, p) | **指定した文字に対応するビットマップを取得します**<BR>**bitmap:** ビットマップ<BR>**fh:** フォントの高さ<BR>**fw:** フォントの幅<BR>**next_p:** 次の文字の位置<BR>**euc:** EUC-JPコード文字列<BR>**p:** 文字の位置(1～#euc)、省略時は1（先頭）  
@@ -122,11 +126,6 @@ bitmap, fh, fw, next_p =<BR> SlibJfont:getFont(euc, p) | **指定した文字に
 ### utf82euc()について  
 UTF-8コードからEUC-JPコードに変換する関数は、mgo-tecさんの"SD_UTF8toSJIS"をアレンジさせていただきました。  
 JIS第一水準、第二水準、１３区、半角カナが変換可能です。  
-
-### カレントディレクトリの取得
-**fontPath:** .sef形式のフォントファイル名には、フルパスを指定してください。  
-カレントディレクトリの取得方法は、サンプルプログラムをご参照ください。  
-function script_path() で取得できます。
 
 ### サンプルコード  
 
