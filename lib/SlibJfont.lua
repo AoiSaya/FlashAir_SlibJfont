@@ -4,7 +4,7 @@
 -- Copyright (c) 2019 AoiSaya
 -- Copyright (c) 2016 Mgo-tec
 -- Blog URL ---> https://www.mgo-tec.com
--- 2019/05/15 rev.0.09
+-- 2019/05/30 rev.0.10
 -----------------------------------------------
 local SlibJfont = {
 	fontList = {},
@@ -21,6 +21,13 @@ local SlibJfont = {
 }
 
 -- sub functions --
+function SlibJfont:script_path()
+	local  str = debug.getinfo(2, "S").source:sub(2)
+	str = str:match("(.*/)")
+	str = str:gsub("/lib/$","/")
+	return str
+end
+
 --***********UTF-8コードをSD内の変換テーブルを読み出してEUC-JPコードに変換****
 function SlibJfont:utf82euc_code_cnv(utf8_1, utf8_2, utf8_3) --return: SD_addrs
 	local SD_addrs = 0xA1A1 --スペース
@@ -164,18 +171,31 @@ end
 function SlibJfont:open(fontPath, convTablePath)
 	local fp, header, ofs
 	local font={}
+	local curPath = self:script_path()
 
+	if not self.fp and not convTablePath then
+		convTablePath = "Utf8Euc_jp.tbl"
+	end
 	if convTablePath then
 		fp = io.open(convTablePath, "rb")
 		if not fp then
-			return nil, "Can't open table file!"
+			fp = io.open(curPath..convTablePath, "rb")
+			if not fp then
+				fp = io.open(curPath.."lib/"..convTablePath, "rb")
+				if not fp then
+					return nil, "Can't open table file!"
+				end
+			end
 		end
 		self.fp = fp
 	end
 
 	fp = io.open(fontPath, "rb")
 	if not fp then
-		return nil, "Can't open file!"
+		fp = io.open(curPath.."font/"..fontPath, "rb")
+		if not fp then
+			return nil, "Can't open font file!"
+		end
 	end
 	header = fp:read(64)
 	if header:sub(1,3)~="SEF" then

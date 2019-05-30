@@ -20,10 +20,9 @@ end
 -- main
 local myDir  = script_path()
 local libDir = myDir.."lib/"
-local fontDir= myDir.."font/"
 local jfont  = require(libDir .. "SlibJfont")
-local k12x10 = jfont:open(fontDir .. "k12x10.sef", libDir .. "Utf8Euc_jp.tbl")
-local k6x10  = jfont:open(fontDir .. "k6x10.sef")
+local k12x10 = jfont:open("k12x10.sef")
+local k6x10  = jfont:open("k6x10.sef")
 local str={
   "ＵＴＦ８→ＥＵＣ　全角日本語漢字変換テスト表",
   "、。〃¢‐　一倅怎瀁耀退！￥熙～",
