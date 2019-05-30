@@ -183,7 +183,7 @@ function SlibJfont:open(fontPath, convTablePath)
 			if not fp then
 				fp = io.open(curPath.."lib/"..convTablePath, "rb")
 				if not fp then
-					return nil, "Can't open table file!"
+--					return nil, "Can't open table file!"
 				end
 			end
 		end
