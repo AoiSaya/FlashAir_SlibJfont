@@ -4,7 +4,7 @@
 -- Copyright (c) 2019 AoiSaya
 -- Copyright (c) 2016 Mgo-tec
 -- Blog URL ---> https://www.mgo-tec.com
--- 2019/05/30 rev.0.10
+-- 2019/06/01 rev.0.11
 -----------------------------------------------
 local SlibJfont = {
 	fontList = {},
@@ -70,6 +70,8 @@ function SlibJfont:sjis2euc(strSJIS) -- return strEUC, euc_length
 	local SJIS1, SJIS2, EUC1, EUC2, strEUC
 	local euc_byte = {}
 
+	strEUC=""
+
 	while fnt_cnt<=str_length do
 		SJIS1 = strSJIS:byte(fnt_cnt)
 		fnt_cnt = fnt_cnt + 1
@@ -99,9 +101,16 @@ function SlibJfont:sjis2euc(strSJIS) -- return strEUC, euc_length
 			euc_cnt	= euc_cnt + 2
 			ank_cnt = ank_cnt + 2
 		end
+		if euc_cnt>500 then
+			strEUC	 = strEUC .. string.char(unpack(euc_byte))
+			euc_byte = {}
+			euc_cnt  = 1
+		end
 		sleep(0)
 	end
-	strEUC = string.char(unpack(euc_byte))
+	if euc_cnt>1 then
+		strEUC = strEUC .. string.char(unpack(euc_byte))
+	end
 	euc_byte = nil
 	collectgarbage()
 	return strEUC, ank_cnt
@@ -126,6 +135,8 @@ function SlibJfont:utf82euc(strUTF8) -- return strEUC, euc_length
 	if fp_table==nil then
 		return nil
 	end
+
+	strEUC=""
 
 	while fnt_cnt<=str_length do
 		utf8_byte = strUTF8:byte(fnt_cnt)
@@ -160,9 +171,16 @@ function SlibJfont:utf82euc(strUTF8) -- return strEUC, euc_length
 			fnt_cnt = fnt_cnt + 1
 			ank_cnt = ank_cnt + 1
 		end
+		if euc_cnt>500 then
+			strEUC	 = strEUC .. string.char(unpack(euc_byte))
+			euc_byte = {}
+			euc_cnt  = 1
+		end
 		sleep(0)
 	end
-	strEUC = string.char(unpack(euc_byte))
+	if euc_cnt>1 then
+		strEUC = strEUC .. string.char(unpack(euc_byte))
+	end
 	euc_byte = nil
 	collectgarbage()
 	return strEUC, ank_cnt
@@ -183,7 +201,7 @@ function SlibJfont:open(fontPath, convTablePath)
 			if not fp then
 				fp = io.open(curPath.."lib/"..convTablePath, "rb")
 				if not fp then
---					return nil, "Can't open table file!"
+					return nil, "Can't open table file!"
 				end
 			end
 		end
