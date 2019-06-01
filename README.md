@@ -3,6 +3,9 @@
 これはFlashAirで日本語フォントを扱うためのライブラリです。  
 UTF-8やShift-JIS、EUC-JP文字に対応するビットマップデータを取得できます。  
 
+2019/06/01 rev.0.11    
+文字コード変換の変換可能文字数を緩和しました。    
+
 2019/05/30 rev.0.10    
 Utf8Euc_jp.tblの指定を不要にしました。    
 フォントファイルはカレントフォルダとカレント/font/をサーチするようにしました。    
@@ -136,7 +139,7 @@ JIS第一水準、第二水準、１３区、半角カナが変換可能です�
     sample_sjis.lua     -- Shift-JISサンプルプログラム  
     sample_sjis.txt     -- Shift-JISプログラム  
 
-BDFフォントファイル "k6x10.bdf" と "k12x10.bdf" を *3)* から入手して  
+BDFフォントファイル "k6x10.bdf" と "k12x10.bdf" を [*3)*](#入手元) から入手して  
 font/ の下に置き、bdf2sef.lua の末尾に  
 
     convBdf2Bin("k6x10.bdf")  
@@ -150,7 +153,7 @@ bdf2sef.lua を実行すると、font/ の下に"k6x10.sef" と "k12x10.sef" が
 
 ## Licence  
 
-[MIT](https://github.com/AoiSaya/FlashAir_SlibJFont/blob/master/LICENSE)  
+[MIT](/LICENSE)  
 
 ## Author  
 
