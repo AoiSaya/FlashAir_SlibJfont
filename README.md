@@ -38,13 +38,13 @@ shnmk12p.bdf *5) (可変幅)
 http://littlelimit.net/misaki.htm  
 X11 BDF 形式：misaki_bdf_2012-06-03.tar.gz (210,238 bytes)  
   
-*2) 漢字12x10ドットフォント - k12x10  
-http://z.apps.atjp.jp/k12x10/  
-X11 bdf形式 (k12x10bdf.tar.gz, 155Kbyte)  
-  
-*3) 6×8 ドット日本語フォント「k6x8」  
+*2) 6×8 ドット日本語フォント「k6x8」  
 http://littlelimit.net/k6x8.htm  
 X11 BDF形式：k6x8bb02.tar.gz (86,333 bytes)  
+  
+*3) 漢字12x10ドットフォント - k12x10  
+http://z.apps.atjp.jp/k12x10/  
+X11 bdf形式 (k12x10bdf.tar.gz, 155Kbyte)  
   
 *4) M+ BITMAP FONTS  
 http://mplus-fonts.osdn.jp/mplus-bitmap-fonts/design/index.html  
