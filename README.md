@@ -1,7 +1,7 @@
 # Lua library for Japanese FONT handler of FlashAir.  
 
 これはFlashAirで日本語フォントを扱うためのライブラリです。  
-UTF-8やShift-JIS、EUC-JP文字に対応するビットマップデータを取得できます。  
+Shift-JIS文字に対応するビットマップデータを、UTF-8やShift-JIS、EUC-JPコードで取得できます。  
 
 2019/08/01 rev.0.12    
 ISO 10646(Unicode)でエンコードされたBDF形式のビットマップフォントに対応しました。    
