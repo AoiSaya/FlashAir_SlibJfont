@@ -4,7 +4,7 @@
 -- Copyright (c) 2019 AoiSaya
 -- Copyright (c) 2016 Mgo-tec
 -- Blog URL ---> https://www.mgo-tec.com
--- 2019/06/01 rev.0.11
+-- 2019/08/01 rev.0.12
 -----------------------------------------------
 local SlibJfont = {
 	fontList = {},
@@ -140,7 +140,6 @@ function SlibJfont:utf82euc(strUTF8) -- return strEUC, euc_length
 
 	while fnt_cnt<=str_length do
 		utf8_byte = strUTF8:byte(fnt_cnt)
-
 		if utf8_byte>=0xC2 and utf8_byte<=0xD1 then --2バイト文字
 			sp_addres = self:utf82euc_code_cnv(strUTF8:byte(fnt_cnt,fnt_cnt+1))
 			EUC1, EUC2 = self:utf82euc_Table_Read(fp_table, sp_addres)
@@ -208,6 +207,10 @@ function SlibJfont:open(fontPath, convTablePath)
 		self.fp = fp
 	end
 
+	if not fontPath then
+		return nil
+	end
+
 	fp = io.open(fontPath, "rb")
 	if not fp then
 		fp = io.open(curPath.."font/"..fontPath, "rb")
@@ -229,8 +232,14 @@ function SlibJfont:open(fontPath, convTablePath)
 	font.height= tonumber(header:sub(11,12),16)
 	font.size  = tonumber(header:sub(13,15),16)
 	font.ofs   = tonumber(header:sub(16,19),16)
+	font.aofs  = font.ofs
+	if font.ofs<0x100 then
+		font.ofs  = 0xA1A1-0x300
+	end
 	font.hnum  = math.floor((font.height+3)/4)
-	ofs = ((font.ofs<0x100) and 0x20 or 0xA1A1)-font.ofs
+	ofs = 0x20	-font.aofs
+	font.aspos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font.size+font.hsize
+	ofs = 0xA1A1-font.ofs
 	font.spos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font.size+font.hsize
 
 	table.insert(self.fontList,font)
@@ -281,6 +290,7 @@ function SlibJfont:getFont(euc, p)
 		c = c*256+d
 		p = p+2
 		font = self.font2
+		ofs = c-font.ofs
 	else
 		if c==0x8E then
 			c = d
@@ -288,6 +298,7 @@ function SlibJfont:getFont(euc, p)
 		end
 		p = p+1
 		font = self.font1
+		ofs = c-font.aofs
 		ank = 1
 	end
 
@@ -295,12 +306,11 @@ function SlibJfont:getFont(euc, p)
 	hnum = font.hnum
 	fh	 = font.height
 	if fp then
-		ofs = c-font.ofs
 		pos = (bit32.extract(ofs,8,8)*0x5E+bit32.band(ofs,0xFF))*font.size+font.hsize
 		fp:seek("set", pos)
 		data = fp:read(2)
 		if not data or ofs<0 then
-			fp:seek("set", font.spos)
+			fp:seek("set", ank and font.aspos or font.spos )
 			data = fp:read(2)
 		end
 		fw = tonumber(data,16)
