@@ -4,7 +4,7 @@
 -- Copyright (c) 2019 AoiSaya
 -- Copyright (c) 2016 Mgo-tec
 -- Blog URL ---> https://www.mgo-tec.com
--- 2019/08/01 rev.0.12
+-- 2019/08/02 rev.0.13
 -----------------------------------------------
 local SlibJfont = {
 	fontList = {},
@@ -321,7 +321,7 @@ function SlibJfont:getFont(euc, p)
 		c = ank and string.char(c) or c
 		bitmap, fw = self.font[c], font.width
 		if not bitmap then
-			bitmap, fw = self.font[ank and " " or 0xA1A1], font.width
+			bitmap, fw = font[ank and " " or 0xA1A1], font.width
 		end
 	end
 
