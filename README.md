@@ -1,7 +1,7 @@
 # Lua library for Japanese FONT handler of FlashAir.  
 
 これはFlashAirで日本語フォントを扱うためのライブラリです。  
-Shift-JIS文字に対応するビットマップデータを、UTF-8やShift-JIS、EUC-JPコードで取得できます。  
+EUC-JP文字に対応するビットマップデータを、UTF-8やShift-JIS、EUC-JPコードで取得できます。  
 
 2019/08/01 rev.0.12    
 ISO 10646(Unicode)でエンコードされたBDF形式のビットマップフォントに対応しました。    
@@ -134,7 +134,7 @@ strEUC, ank_cnt=<BR> SlibJfont:utf82euc(strUTF8) | **UTF-8コード文字列をE
 font,mes = SlibJfont:open(fontPath) | **フォントファイルをオープンし、管理情報を取得します**<BR>**font:** フォント管理情報、ファイルオープンに失敗した場合は nil<BR>**mes:** エラーメッセージ<BR>**fontPath:** .sef形式のフォントファイル名またはパス名<BR>見つからない場合はカレント/font/の下をさがします
 SlibJfont:close(font) | **フォントファイルをクローズします**<BR>**font:** フォント管理情報、省略すると全てクローズ  
 SlibJfont:setFont(font1,font2) | **getFont()で使用するフォントを指定します**<BR>**font1:** 半角文字用フォント管理情報、変更しないときは省略可<BR>**font2:** 全角文字用フォント管理情報、変更しないときは省略可<br>半角文字と全角文字の両方を含むフォントでは同じ管理情報を指定することができます。
-bitmap, fh, fw, next_p =<BR> SlibJfont:getFont(euc, p) | **指定した文字に対応するビットマップを取得します**<BR>**bitmap:** ビットマップ<BR>**fh:** フォントの高さ<BR>**fw:** フォントの幅<BR>**next_p:** 次の文字の位置<BR>**euc:** EUC-JPコード文字列<BR>**p:** 文字の位置(1～#euc)、省略時は1（先頭）  
+bitmap, fh, fw, next_p =<BR> SlibJfont:getFont(euc, p) | **指定したEUC-JPコード文字列に対応するビットマップを取得します**<BR>**bitmap:** ビットマップ<BR>**fh:** フォントの高さ<BR>**fw:** フォントの幅<BR>**next_p:** 次の文字の位置<BR>**euc:** EUC-JPコード文字列<BR>**p:** 文字の位置(1～#euc)、省略時は1（先頭）  
 
 ### utf82euc()について  
 UTF-8コードからEUC-JPコードに変換する関数は、mgo-tecさんの"SD_UTF8toSJIS"をアレンジさせていただきました。  
