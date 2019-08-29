@@ -4,7 +4,7 @@
 -- Copyright (c) 2019 AoiSaya
 -- Copyright (c) 2016 Mgo-tec
 -- Blog URL ---> https://www.mgo-tec.com
--- 2019/08/02 rev.0.13
+-- 2019/08/30 rev.0.15 BUG fix
 -----------------------------------------------
 local SlibJfont = {
 	fontList = {},
@@ -268,7 +268,7 @@ function SlibJfont:close(font)
 	collectgarbage()
 end
 
-function SlibJfont:setFont(font1,font2)
+function SlibJfont:setFont(font1,font2,font3,font4) -- Hankaku,Zenkaku,Zenkaku-kana,Zenkaku-ank
 	local ofs
 
 	if font1 then
@@ -276,6 +276,12 @@ function SlibJfont:setFont(font1,font2)
 	end
 	if font2 then
 		self.font2 = font2
+	end
+	if font3 then
+		self.font3 = font3
+	end
+	if font4 then
+		self.font4 = font4
 	end
 end
 
@@ -290,9 +296,17 @@ function SlibJfont:getFont(euc, p)
 		c = c*256+d
 		p = p+2
 		font = self.font2
+
+		if self.font4 and c<0x30 then -- 全角記号
+			font = self.font4
+		end
+		if self.font3 and 0x24<=c and c<26 then -- 全角ひらがな＋カタカナ
+			font = self.font3
+		end
 		ofs = c-font.ofs
-	else
-		if c==0x8E then
+	else -- 半角コード
+		if c==0x8E then -- 半角カナコード
+		ofs = c-font.ofs
 			c = d
 			p = p+1
 		end
@@ -319,7 +333,7 @@ function SlibJfont:getFont(euc, p)
 		end
 	else
 		c = ank and string.char(c) or c
-		bitmap, fw = self.font[c], font.width
+		bitmap, fw = font[c], font.width
 		if not bitmap then
 			bitmap, fw = font[ank and " " or 0xA1A1], font.width
 		end
